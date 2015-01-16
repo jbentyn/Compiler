@@ -1,0 +1,141 @@
+Gramatyka
+
+    0 $accept: program $end
+
+    1 program: TOKEN_PROGRAM program_identifier ';' main_instruction_block
+
+    2 program_identifier: TOKEN_ID
+
+    3 main_instruction_block: main_begin main_end '.'
+
+    4 main_begin: TOKEN_BEGIN
+
+    5 main_end: TOKEN_END
+
+
+Symbole terminalne i reguły, w których występują
+
+$end (0) 0
+'.' (46) 3
+';' (59) 1
+error (256)
+TOKEN_PROGRAM (258) 1
+TOKEN_BEGIN (259) 4
+TOKEN_END (260) 5
+TOKEN_ID (261) 2
+
+
+Symbole nieterminalne i reguły, w których występują
+
+$accept (9)
+    po lewej: 0
+program (10)
+    po lewej: 1, po prawej: 0
+program_identifier (11)
+    po lewej: 2, po prawej: 1
+main_instruction_block (12)
+    po lewej: 3, po prawej: 1
+main_begin (13)
+    po lewej: 4, po prawej: 3
+main_end (14)
+    po lewej: 5, po prawej: 3
+
+
+Stan 0
+
+    0 $accept: . program $end
+
+    TOKEN_PROGRAM  przesunięcie, i przejście do stanu 1
+
+    program  przejście do stanu 2
+
+
+Stan 1
+
+    1 program: TOKEN_PROGRAM . program_identifier ';' main_instruction_block
+
+    TOKEN_ID  przesunięcie, i przejście do stanu 3
+
+    program_identifier  przejście do stanu 4
+
+
+Stan 2
+
+    0 $accept: program . $end
+
+    $end  przesunięcie, i przejście do stanu 5
+
+
+Stan 3
+
+    2 program_identifier: TOKEN_ID .
+
+    $domyślnie  redukcja przy użyciu reguły 2 (program_identifier)
+
+
+Stan 4
+
+    1 program: TOKEN_PROGRAM program_identifier . ';' main_instruction_block
+
+    ';'  przesunięcie, i przejście do stanu 6
+
+
+Stan 5
+
+    0 $accept: program $end .
+
+    $domyślnie  akceptowanie
+
+
+Stan 6
+
+    1 program: TOKEN_PROGRAM program_identifier ';' . main_instruction_block
+
+    TOKEN_BEGIN  przesunięcie, i przejście do stanu 7
+
+    main_instruction_block  przejście do stanu 8
+    main_begin              przejście do stanu 9
+
+
+Stan 7
+
+    4 main_begin: TOKEN_BEGIN .
+
+    $domyślnie  redukcja przy użyciu reguły 4 (main_begin)
+
+
+Stan 8
+
+    1 program: TOKEN_PROGRAM program_identifier ';' main_instruction_block .
+
+    $domyślnie  redukcja przy użyciu reguły 1 (program)
+
+
+Stan 9
+
+    3 main_instruction_block: main_begin . main_end '.'
+
+    TOKEN_END  przesunięcie, i przejście do stanu 10
+
+    main_end  przejście do stanu 11
+
+
+Stan 10
+
+    5 main_end: TOKEN_END .
+
+    $domyślnie  redukcja przy użyciu reguły 5 (main_end)
+
+
+Stan 11
+
+    3 main_instruction_block: main_begin main_end . '.'
+
+    '.'  przesunięcie, i przejście do stanu 12
+
+
+Stan 12
+
+    3 main_instruction_block: main_begin main_end '.' .
+
+    $domyślnie  redukcja przy użyciu reguły 3 (main_instruction_block)

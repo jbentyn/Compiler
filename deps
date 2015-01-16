@@ -1,0 +1,9 @@
+emitter.o: emitter.cpp emitter.h
+lexer.o: lexer.cpp parser.h symbolTable.h enums.h symbol.h emitter.h
+main.o: main.cpp lexer.h parser.h symbolTable.h enums.h symbol.h \
+ emitter.h
+parser.o: parser.cpp symbolTable.h enums.h symbol.h emitter.h
+symbol.o: symbol.cpp symbol.h enums.h
+symbolTable.o: symbolTable.cpp symbolTable.h enums.h symbol.h
+lexer.o: lexer.cpp parser.h symbolTable.h enums.h symbol.h emitter.h
+parser.o: parser.cpp symbolTable.h enums.h symbol.h emitter.h
