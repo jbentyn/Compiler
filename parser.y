@@ -16,19 +16,22 @@
 
 //------variables	
 	vector<int> varsIndexesToAssign;
-	
+	vector<int> argumentIndexesToAssign;
 	
 //------methods
   
     void onProgramIdentifier(int programIndex);
 
-   
     void onProgramBegin();
 	
- 
     void onProgramEnd();
     
-	void onVarDeclaration();
+	void onVarDeclaration(int type);
+	
+	void onAssign(int left,int right);
+	
+	void onWrite();
+	
 %}
 // -------------------------------------------
 // ------------ TOKENS DEFINITION ------------
@@ -43,6 +46,14 @@
 %token TOKEN_VAR
 %token TOKEN_INT
 %token TOKEN_REAL
+%token TOKEN_WRITE
+
+// NUMBERS
+%token TOKEN_NUM_INT
+%token TOKEN_NUM_REAL 
+
+//OPERATORS
+%token TOKEN_OP_ASSIGN
 
 %token TOKEN_ID
 
@@ -52,7 +63,7 @@
 //----------- GRAMMAR DEFINITION ------------ 
 //------------------------------------------- 
 program: 
-	TOKEN_PROGRAM program_identifier ';' var_declarations main_instruction_block{
+	TOKEN_PROGRAM program_identifier '(' TOKEN_ID ',' TOKEN_ID ')' ';' var_declarations main_instruction_block{
 		cout << "BISON FOUND PROGRAM: " << $$ << endl; 
 	}										
 ;
@@ -65,7 +76,7 @@ program_identifier:
 ;
 
 main_instruction_block:
-	main_begin  main_end '.' {
+	main_begin instructions main_end '.' {
 		cout << "BISON FOUND MAIN INSTRUCTION BLOCK" << endl; 
 	}
 ;
@@ -81,14 +92,11 @@ main_end:
 		onProgramEnd();
 	}
 ;
+
 //---------- Variables declarations-------
 var_declarations:
 	var_declarations TOKEN_VAR var_list ':' var_type ';'{
-		cout << "BISON FOUND var declarations" << endl;
-		for (int i = 0; i < varsIndexesToAssign.size(); i++){
-			table.assignVar(varsIndexesToAssign[i],static_cast<SymbolType>($5));
-		}
-		varsIndexesToAssign.clear();
+		 onVarDeclaration($5);
 	}
 	|
 	{}
@@ -118,6 +126,45 @@ var_type :
 	}
 ;
 
+//---------- Instructions ----------------
+expr :
+	TOKEN_ID|
+	TOKEN_NUM_INT|
+	TOKEN_NUM_REAL{
+		cout << "BISON FOUND EXPRESSION" << endl;
+		$$=$1;
+	}	
+;
+
+instructions:
+	instructions TOKEN_ID TOKEN_OP_ASSIGN expr ';'{
+		cout << "BISON FOUND ASSIGN" << endl;
+		onAssign($2,$4);
+	}
+	| instructions procedure ';' {
+	}
+	|{}
+;
+
+// -------- Procedures
+procedure: 
+	TOKEN_WRITE '(' arguments ')' {
+	cout << "BISON FOUND WRITE" << endl;
+		onWrite();
+	}
+;
+
+arguments:
+	arguments ',' expr {
+		cout << "BISON FOUND ARGUMENTS" << endl;
+		argumentIndexesToAssign.push_back($3);
+	}
+	| expr {
+		cout << "BISON FOUND ARGUMENTS" << endl;
+		argumentIndexesToAssign.push_back($1);
+	}
+	|{}
+;	
 
 %%
 //------------------------------------------- 
@@ -145,8 +192,21 @@ void onProgramEnd() {
 	  emit.putEnd();
 }
 
-void onVarDeclaration(){
+void onVarDeclaration(int type){
 	 cout<<"BISON VAR DECLARATION"<<endl;
+	 for (int i = 0; i < varsIndexesToAssign.size(); i++){
+			table.assignVar(varsIndexesToAssign[i],static_cast<SymbolType>(type));
+		}
+		varsIndexesToAssign.clear();
 }
 
+void onAssign(int left,int right){
+	emit.putAssign(left,right);
+}
 
+void onWrite(){
+	for (int i=0;i<argumentIndexesToAssign.size() ;i++){
+		emit.putWrite(argumentIndexesToAssign[i]);
+	}
+	argumentIndexesToAssign.clear();
+}

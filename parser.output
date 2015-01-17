@@ -2,11 +2,11 @@ Gramatyka
 
     0 $accept: program $end
 
-    1 program: TOKEN_PROGRAM program_identifier ';' var_declarations main_instruction_block
+    1 program: TOKEN_PROGRAM program_identifier '(' TOKEN_ID ',' TOKEN_ID ')' ';' var_declarations main_instruction_block
 
     2 program_identifier: TOKEN_ID
 
-    3 main_instruction_block: main_begin main_end '.'
+    3 main_instruction_block: main_begin instructions main_end '.'
 
     4 main_begin: TOKEN_BEGIN
 
@@ -21,14 +21,30 @@ Gramatyka
    10 var_type: TOKEN_INT
    11         | TOKEN_REAL
 
+   12 expr: TOKEN_ID
+   13     | TOKEN_NUM_INT
+   14     | TOKEN_NUM_REAL
+
+   15 instructions: instructions TOKEN_ID TOKEN_OP_ASSIGN expr ';'
+   16             | instructions procedure ';'
+   17             | %empty
+
+   18 procedure: TOKEN_WRITE '(' arguments ')'
+
+   19 arguments: arguments ',' expr
+   20          | expr
+   21          | %empty
+
 
 Symbole terminalne i reguły, w których występują
 
 $end (0) 0
-',' (44) 9
+'(' (40) 1 18
+')' (41) 1 18
+',' (44) 1 9 19
 '.' (46) 3
 ':' (58) 6
-';' (59) 1 6
+';' (59) 1 6 15 16
 error (256)
 TOKEN_PROGRAM (258) 1
 TOKEN_BEGIN (259) 4
@@ -36,29 +52,41 @@ TOKEN_END (260) 5
 TOKEN_VAR (261) 6
 TOKEN_INT (262) 10
 TOKEN_REAL (263) 11
-TOKEN_ID (264) 2 8 9
+TOKEN_WRITE (264) 18
+TOKEN_NUM_INT (265) 13
+TOKEN_NUM_REAL (266) 14
+TOKEN_OP_ASSIGN (267) 15
+TOKEN_ID (268) 1 2 8 9 12 15
 
 
 Symbole nieterminalne i reguły, w których występują
 
-$accept (14)
+$accept (20)
     po lewej: 0
-program (15)
+program (21)
     po lewej: 1, po prawej: 0
-program_identifier (16)
+program_identifier (22)
     po lewej: 2, po prawej: 1
-main_instruction_block (17)
+main_instruction_block (23)
     po lewej: 3, po prawej: 1
-main_begin (18)
+main_begin (24)
     po lewej: 4, po prawej: 3
-main_end (19)
+main_end (25)
     po lewej: 5, po prawej: 3
-var_declarations (20)
+var_declarations (26)
     po lewej: 6 7, po prawej: 1 6
-var_list (21)
+var_list (27)
     po lewej: 8 9, po prawej: 6 9
-var_type (22)
+var_type (28)
     po lewej: 10 11, po prawej: 6
+expr (29)
+    po lewej: 12 13 14, po prawej: 15 19 20
+instructions (30)
+    po lewej: 15 16 17, po prawej: 3 15 16
+procedure (31)
+    po lewej: 18, po prawej: 16
+arguments (32)
+    po lewej: 19 20 21, po prawej: 18 19
 
 
 Stan 0
@@ -72,7 +100,7 @@ Stan 0
 
 Stan 1
 
-    1 program: TOKEN_PROGRAM . program_identifier ';' var_declarations main_instruction_block
+    1 program: TOKEN_PROGRAM . program_identifier '(' TOKEN_ID ',' TOKEN_ID ')' ';' var_declarations main_instruction_block
 
     TOKEN_ID  przesunięcie, i przejście do stanu 3
 
@@ -95,9 +123,9 @@ Stan 3
 
 Stan 4
 
-    1 program: TOKEN_PROGRAM program_identifier . ';' var_declarations main_instruction_block
+    1 program: TOKEN_PROGRAM program_identifier . '(' TOKEN_ID ',' TOKEN_ID ')' ';' var_declarations main_instruction_block
 
-    ';'  przesunięcie, i przejście do stanu 6
+    '('  przesunięcie, i przejście do stanu 6
 
 
 Stan 5
@@ -109,141 +137,319 @@ Stan 5
 
 Stan 6
 
-    1 program: TOKEN_PROGRAM program_identifier ';' . var_declarations main_instruction_block
+    1 program: TOKEN_PROGRAM program_identifier '(' . TOKEN_ID ',' TOKEN_ID ')' ';' var_declarations main_instruction_block
 
-    $domyślnie  redukcja przy użyciu reguły 7 (var_declarations)
-
-    var_declarations  przejście do stanu 7
+    TOKEN_ID  przesunięcie, i przejście do stanu 7
 
 
 Stan 7
 
-    1 program: TOKEN_PROGRAM program_identifier ';' var_declarations . main_instruction_block
-    6 var_declarations: var_declarations . TOKEN_VAR var_list ':' var_type ';'
+    1 program: TOKEN_PROGRAM program_identifier '(' TOKEN_ID . ',' TOKEN_ID ')' ';' var_declarations main_instruction_block
 
-    TOKEN_BEGIN  przesunięcie, i przejście do stanu 8
-    TOKEN_VAR    przesunięcie, i przejście do stanu 9
-
-    main_instruction_block  przejście do stanu 10
-    main_begin              przejście do stanu 11
+    ','  przesunięcie, i przejście do stanu 8
 
 
 Stan 8
+
+    1 program: TOKEN_PROGRAM program_identifier '(' TOKEN_ID ',' . TOKEN_ID ')' ';' var_declarations main_instruction_block
+
+    TOKEN_ID  przesunięcie, i przejście do stanu 9
+
+
+Stan 9
+
+    1 program: TOKEN_PROGRAM program_identifier '(' TOKEN_ID ',' TOKEN_ID . ')' ';' var_declarations main_instruction_block
+
+    ')'  przesunięcie, i przejście do stanu 10
+
+
+Stan 10
+
+    1 program: TOKEN_PROGRAM program_identifier '(' TOKEN_ID ',' TOKEN_ID ')' . ';' var_declarations main_instruction_block
+
+    ';'  przesunięcie, i przejście do stanu 11
+
+
+Stan 11
+
+    1 program: TOKEN_PROGRAM program_identifier '(' TOKEN_ID ',' TOKEN_ID ')' ';' . var_declarations main_instruction_block
+
+    $domyślnie  redukcja przy użyciu reguły 7 (var_declarations)
+
+    var_declarations  przejście do stanu 12
+
+
+Stan 12
+
+    1 program: TOKEN_PROGRAM program_identifier '(' TOKEN_ID ',' TOKEN_ID ')' ';' var_declarations . main_instruction_block
+    6 var_declarations: var_declarations . TOKEN_VAR var_list ':' var_type ';'
+
+    TOKEN_BEGIN  przesunięcie, i przejście do stanu 13
+    TOKEN_VAR    przesunięcie, i przejście do stanu 14
+
+    main_instruction_block  przejście do stanu 15
+    main_begin              przejście do stanu 16
+
+
+Stan 13
 
     4 main_begin: TOKEN_BEGIN .
 
     $domyślnie  redukcja przy użyciu reguły 4 (main_begin)
 
 
-Stan 9
+Stan 14
 
     6 var_declarations: var_declarations TOKEN_VAR . var_list ':' var_type ';'
 
-    TOKEN_ID  przesunięcie, i przejście do stanu 12
+    TOKEN_ID  przesunięcie, i przejście do stanu 17
 
-    var_list  przejście do stanu 13
+    var_list  przejście do stanu 18
 
 
-Stan 10
+Stan 15
 
-    1 program: TOKEN_PROGRAM program_identifier ';' var_declarations main_instruction_block .
+    1 program: TOKEN_PROGRAM program_identifier '(' TOKEN_ID ',' TOKEN_ID ')' ';' var_declarations main_instruction_block .
 
     $domyślnie  redukcja przy użyciu reguły 1 (program)
 
 
-Stan 11
+Stan 16
 
-    3 main_instruction_block: main_begin . main_end '.'
+    3 main_instruction_block: main_begin . instructions main_end '.'
 
-    TOKEN_END  przesunięcie, i przejście do stanu 14
+    $domyślnie  redukcja przy użyciu reguły 17 (instructions)
 
-    main_end  przejście do stanu 15
+    instructions  przejście do stanu 19
 
 
-Stan 12
+Stan 17
 
     8 var_list: TOKEN_ID .
 
     $domyślnie  redukcja przy użyciu reguły 8 (var_list)
 
 
-Stan 13
+Stan 18
 
     6 var_declarations: var_declarations TOKEN_VAR var_list . ':' var_type ';'
     9 var_list: var_list . ',' TOKEN_ID
 
-    ':'  przesunięcie, i przejście do stanu 16
-    ','  przesunięcie, i przejście do stanu 17
+    ','  przesunięcie, i przejście do stanu 20
+    ':'  przesunięcie, i przejście do stanu 21
 
 
-Stan 14
+Stan 19
+
+    3 main_instruction_block: main_begin instructions . main_end '.'
+   15 instructions: instructions . TOKEN_ID TOKEN_OP_ASSIGN expr ';'
+   16             | instructions . procedure ';'
+
+    TOKEN_END    przesunięcie, i przejście do stanu 22
+    TOKEN_WRITE  przesunięcie, i przejście do stanu 23
+    TOKEN_ID     przesunięcie, i przejście do stanu 24
+
+    main_end   przejście do stanu 25
+    procedure  przejście do stanu 26
+
+
+Stan 20
+
+    9 var_list: var_list ',' . TOKEN_ID
+
+    TOKEN_ID  przesunięcie, i przejście do stanu 27
+
+
+Stan 21
+
+    6 var_declarations: var_declarations TOKEN_VAR var_list ':' . var_type ';'
+
+    TOKEN_INT   przesunięcie, i przejście do stanu 28
+    TOKEN_REAL  przesunięcie, i przejście do stanu 29
+
+    var_type  przejście do stanu 30
+
+
+Stan 22
 
     5 main_end: TOKEN_END .
 
     $domyślnie  redukcja przy użyciu reguły 5 (main_end)
 
 
-Stan 15
+Stan 23
 
-    3 main_instruction_block: main_begin main_end . '.'
+   18 procedure: TOKEN_WRITE . '(' arguments ')'
 
-    '.'  przesunięcie, i przejście do stanu 18
-
-
-Stan 16
-
-    6 var_declarations: var_declarations TOKEN_VAR var_list ':' . var_type ';'
-
-    TOKEN_INT   przesunięcie, i przejście do stanu 19
-    TOKEN_REAL  przesunięcie, i przejście do stanu 20
-
-    var_type  przejście do stanu 21
+    '('  przesunięcie, i przejście do stanu 31
 
 
-Stan 17
+Stan 24
 
-    9 var_list: var_list ',' . TOKEN_ID
+   15 instructions: instructions TOKEN_ID . TOKEN_OP_ASSIGN expr ';'
 
-    TOKEN_ID  przesunięcie, i przejście do stanu 22
-
-
-Stan 18
-
-    3 main_instruction_block: main_begin main_end '.' .
-
-    $domyślnie  redukcja przy użyciu reguły 3 (main_instruction_block)
+    TOKEN_OP_ASSIGN  przesunięcie, i przejście do stanu 32
 
 
-Stan 19
+Stan 25
 
-   10 var_type: TOKEN_INT .
+    3 main_instruction_block: main_begin instructions main_end . '.'
 
-    $domyślnie  redukcja przy użyciu reguły 10 (var_type)
-
-
-Stan 20
-
-   11 var_type: TOKEN_REAL .
-
-    $domyślnie  redukcja przy użyciu reguły 11 (var_type)
+    '.'  przesunięcie, i przejście do stanu 33
 
 
-Stan 21
+Stan 26
 
-    6 var_declarations: var_declarations TOKEN_VAR var_list ':' var_type . ';'
+   16 instructions: instructions procedure . ';'
 
-    ';'  przesunięcie, i przejście do stanu 23
+    ';'  przesunięcie, i przejście do stanu 34
 
 
-Stan 22
+Stan 27
 
     9 var_list: var_list ',' TOKEN_ID .
 
     $domyślnie  redukcja przy użyciu reguły 9 (var_list)
 
 
-Stan 23
+Stan 28
+
+   10 var_type: TOKEN_INT .
+
+    $domyślnie  redukcja przy użyciu reguły 10 (var_type)
+
+
+Stan 29
+
+   11 var_type: TOKEN_REAL .
+
+    $domyślnie  redukcja przy użyciu reguły 11 (var_type)
+
+
+Stan 30
+
+    6 var_declarations: var_declarations TOKEN_VAR var_list ':' var_type . ';'
+
+    ';'  przesunięcie, i przejście do stanu 35
+
+
+Stan 31
+
+   18 procedure: TOKEN_WRITE '(' . arguments ')'
+
+    TOKEN_NUM_INT   przesunięcie, i przejście do stanu 36
+    TOKEN_NUM_REAL  przesunięcie, i przejście do stanu 37
+    TOKEN_ID        przesunięcie, i przejście do stanu 38
+
+    $domyślnie  redukcja przy użyciu reguły 21 (arguments)
+
+    expr       przejście do stanu 39
+    arguments  przejście do stanu 40
+
+
+Stan 32
+
+   15 instructions: instructions TOKEN_ID TOKEN_OP_ASSIGN . expr ';'
+
+    TOKEN_NUM_INT   przesunięcie, i przejście do stanu 36
+    TOKEN_NUM_REAL  przesunięcie, i przejście do stanu 37
+    TOKEN_ID        przesunięcie, i przejście do stanu 38
+
+    expr  przejście do stanu 41
+
+
+Stan 33
+
+    3 main_instruction_block: main_begin instructions main_end '.' .
+
+    $domyślnie  redukcja przy użyciu reguły 3 (main_instruction_block)
+
+
+Stan 34
+
+   16 instructions: instructions procedure ';' .
+
+    $domyślnie  redukcja przy użyciu reguły 16 (instructions)
+
+
+Stan 35
 
     6 var_declarations: var_declarations TOKEN_VAR var_list ':' var_type ';' .
 
     $domyślnie  redukcja przy użyciu reguły 6 (var_declarations)
+
+
+Stan 36
+
+   13 expr: TOKEN_NUM_INT .
+
+    $domyślnie  redukcja przy użyciu reguły 13 (expr)
+
+
+Stan 37
+
+   14 expr: TOKEN_NUM_REAL .
+
+    $domyślnie  redukcja przy użyciu reguły 14 (expr)
+
+
+Stan 38
+
+   12 expr: TOKEN_ID .
+
+    $domyślnie  redukcja przy użyciu reguły 12 (expr)
+
+
+Stan 39
+
+   20 arguments: expr .
+
+    $domyślnie  redukcja przy użyciu reguły 20 (arguments)
+
+
+Stan 40
+
+   18 procedure: TOKEN_WRITE '(' arguments . ')'
+   19 arguments: arguments . ',' expr
+
+    ','  przesunięcie, i przejście do stanu 42
+    ')'  przesunięcie, i przejście do stanu 43
+
+
+Stan 41
+
+   15 instructions: instructions TOKEN_ID TOKEN_OP_ASSIGN expr . ';'
+
+    ';'  przesunięcie, i przejście do stanu 44
+
+
+Stan 42
+
+   19 arguments: arguments ',' . expr
+
+    TOKEN_NUM_INT   przesunięcie, i przejście do stanu 36
+    TOKEN_NUM_REAL  przesunięcie, i przejście do stanu 37
+    TOKEN_ID        przesunięcie, i przejście do stanu 38
+
+    expr  przejście do stanu 45
+
+
+Stan 43
+
+   18 procedure: TOKEN_WRITE '(' arguments ')' .
+
+    $domyślnie  redukcja przy użyciu reguły 18 (procedure)
+
+
+Stan 44
+
+   15 instructions: instructions TOKEN_ID TOKEN_OP_ASSIGN expr ';' .
+
+    $domyślnie  redukcja przy użyciu reguły 15 (instructions)
+
+
+Stan 45
+
+   19 arguments: arguments ',' expr .
+
+    $domyślnie  redukcja przy użyciu reguły 19 (arguments)

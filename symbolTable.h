@@ -28,9 +28,14 @@ public:
 
 
     int putIdentifier(string name);
+    void assignVar(int index, SymbolType type);
+    int putNumber(string lexem,SymbolType type); 
+    
+    
+    
     symbol& getSymbol(int index);
     void setSymbolType(int index, SymbolType type);
-    void assignVar(int index, SymbolType type);
+   
     void printAll();
 private:
 

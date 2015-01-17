@@ -14,17 +14,15 @@
 #include "emitter.h"
 using namespace std;
 
-  symbolTable table;
-  emitter emit;
-    
+symbolTable table;
+emitter emit(table);
+
 int main(int argc, char** argv) {
-    
-  
-    
-    cout<<"Hello"<<endl;
+
     yyparse();
-    
+    cout << endl << endl;
     table.printAll();
+
     emit.flush("out.asm");
     return 0;
 }

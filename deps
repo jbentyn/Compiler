@@ -1,4 +1,4 @@
-emitter.o: emitter.cpp emitter.h
+emitter.o: emitter.cpp emitter.h symbolTable.h enums.h symbol.h
 lexer.o: lexer.cpp parser.h symbolTable.h enums.h symbol.h emitter.h
 main.o: main.cpp lexer.h parser.h symbolTable.h enums.h symbol.h \
  emitter.h

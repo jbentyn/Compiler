@@ -51,7 +51,11 @@ extern int yydebug;
     TOKEN_VAR = 261,
     TOKEN_INT = 262,
     TOKEN_REAL = 263,
-    TOKEN_ID = 264
+    TOKEN_WRITE = 264,
+    TOKEN_NUM_INT = 265,
+    TOKEN_NUM_REAL = 266,
+    TOKEN_OP_ASSIGN = 267,
+    TOKEN_ID = 268
   };
 #endif
 

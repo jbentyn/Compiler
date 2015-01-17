@@ -14,9 +14,11 @@ enum SymbolType{
     ST_NONE,
     ST_PROGAM_IDENTIFIER,
     ST_VAR_INT,
-    ST_VAR_REAL
+    ST_VAR_REAL,
+    ST_NUM_INT,
+    ST_NUM_REAL
 };
-static const char * SymbolTypeStrings[] = { "NONE", "PROGRAM_ID","INT","REAL" };
+static const char * SymbolTypeStrings[] = { "NONE", "PROGRAM_ID","INT","REAL","NUM_INT","NUM_REAL" };
 
 static int INT_SIZE=4;
 static int REAL_SIZE=8;

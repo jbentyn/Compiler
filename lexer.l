@@ -3,7 +3,8 @@
     
     #include "parser.h"
 	#include "symbolTable.h"
-#include "emitter.h"
+	#include "enums.h"
+	#include "emitter.h"
 	
     using namespace std;
 	extern symbolTable table;
@@ -12,6 +13,11 @@
 
 
 identifier			[a-zA-Z]([[:alnum:]])*
+real_number			{int_number}\.[0-9]+
+int_number			-?[0-9]+
+
+
+op_assign			":="
 
 %%
 [[:blank:]\r] {/* SKIP */}
@@ -51,11 +57,33 @@ identifier			[a-zA-Z]([[:alnum:]])*
 	return TOKEN_END;	
 }
 
+"write" {
+	cout << "FLEX write" << endl;
+	return TOKEN_WRITE;	
+}
+
+{op_assign} {
+	cout << "FLEX operator assign" << endl;
+	return TOKEN_OP_ASSIGN;	
+}
+
 {identifier} {
 	cout<<"FLEX identifier "<<yytext<<endl;
 	yylval=table.putIdentifier(yytext);
 	cout<<"YYVAL identifier "<<yylval<<endl;
 	return TOKEN_ID;
+}
+
+{int_number} {
+	cout<<"FLEX int_number "<<yytext<<endl;
+	yylval=table.putNumber(yytext,ST_NUM_INT);
+	return TOKEN_NUM_INT;
+}
+
+{real_number} {
+	cout<<"FLEX int_number "<<yytext<<endl;
+	yylval=table.putNumber(yytext,ST_NUM_REAL);
+	return TOKEN_NUM_REAL;
 }
 
 . {

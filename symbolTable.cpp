@@ -16,6 +16,7 @@ int symbolTable::putIdentifier(string name) {
     //if identifier has been declared
     for (int i = 0; i < table.size(); i++){
         if (name.compare(table[i].lexem) == 0){
+            cout<<"identifier already stored"<<endl;
             return i;
         }
     }
@@ -40,6 +41,15 @@ void symbolTable::assignVar(int index, SymbolType type) {
     this->nextFreeAdress += assignedSize;
 }
 
+int symbolTable::putNumber(string lexem,SymbolType type){
+    symbol s;
+    s.lexem=lexem;
+    s.type=type;
+    table.push_back(s);
+    s.print();
+    return table.size()-1;
+}
+
 symbol& symbolTable::getSymbol(int index) {
     return table[index];
 }
@@ -49,6 +59,7 @@ void symbolTable::setSymbolType(int index, SymbolType type) {
 }
 
 void symbolTable::printAll() {
+    cout<<"table size "<<table.size()<<endl;
     for (int i = 0; i < table.size(); i++) {
         cout << "index " << setw(3) << left << i;
         cout << "lexem " << setw(7) << left << table[i].lexem;

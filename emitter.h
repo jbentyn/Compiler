@@ -8,18 +8,31 @@
 #ifndef EMITTER_H
 #define	EMITTER_H
 
+
 #include <sstream>
 #include <fstream>
+#include <vector>
+
+#include "symbolTable.h"
+#include "symbol.h"
 
 using namespace std;
 
+ 
+
 class emitter {
 public:
-    emitter();
-    emitter(const emitter& orig);
+    symbolTable& table;
+    
+    emitter(symbolTable& table);
+
     
     void putProgram(string programName);
     void putEnd();
+    void putAssign(int left,int right);
+    
+    void putWrite(int index);
+    
     void flush(const char* fileName) ;
     virtual ~emitter();
 private:
