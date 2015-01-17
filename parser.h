@@ -48,7 +48,10 @@ extern int yydebug;
     TOKEN_PROGRAM = 258,
     TOKEN_BEGIN = 259,
     TOKEN_END = 260,
-    TOKEN_ID = 261
+    TOKEN_VAR = 261,
+    TOKEN_INT = 262,
+    TOKEN_REAL = 263,
+    TOKEN_ID = 264
   };
 #endif
 

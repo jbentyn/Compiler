@@ -5,16 +5,18 @@
  * Created on 12 stycznia 2015, 09:12
  */
 
+#include <sstream>
+
 #include "symbol.h"
 
 
 symbol::symbol() {
-    this->lexem="";
     this->adress=-1;
-    this->type = NONE;
+    this->type = ST_NONE;
 }
 
-symbol::symbol(const symbol& orig) {
+void symbol::print(){
+    cout<<"lexem "<<lexem<<" adress "<<adress<<" type "<< SymbolTypeStrings[type]<<endl;
 }
 
 symbol::~symbol() {

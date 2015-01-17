@@ -9,9 +9,14 @@
 #define	SYMBOLTABLE_H
 
 #include <vector>
+#include <iomanip>
+#include <iostream>
 
 #include "enums.h"
 #include "symbol.h"
+
+
+
 using namespace std;
 
 class symbolTable {
@@ -20,10 +25,13 @@ public:
     symbolTable(SymbolType type);
     symbolTable(const symbolTable& orig);
     virtual ~symbolTable();
-    int putProgramSymbol(string programName);
+
+
     int putIdentifier(string name);
     symbol& getSymbol(int index);
- 
+    void setSymbolType(int index, SymbolType type);
+    void assignVar(int index, SymbolType type);
+    void printAll();
 private:
 
     vector<symbol> table;

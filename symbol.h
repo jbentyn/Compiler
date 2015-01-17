@@ -7,19 +7,27 @@
 
 #ifndef SYMBOL_H
 #define	SYMBOL_H
+
 #include <string>
+#include <iomanip>
+#include <iostream>
+
 #include "enums.h"
+
 using namespace std;
+
 class symbol {
 public:
     symbol();
-    symbol(const symbol& orig);
+
     virtual ~symbol();
     
     //fields
     int adress;
     string lexem;
     SymbolType type;
+
+    void print();
 private:
    
 };

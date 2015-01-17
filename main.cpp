@@ -23,6 +23,8 @@ int main(int argc, char** argv) {
     
     cout<<"Hello"<<endl;
     yyparse();
+    
+    table.printAll();
     emit.flush("out.asm");
     return 0;
 }

@@ -31,6 +31,21 @@ identifier			[a-zA-Z]([[:alnum:]])*
 	return TOKEN_BEGIN;
 }
 
+"var" {
+	cout << "FLEX var" << endl;
+	return TOKEN_VAR;
+}
+
+"integer" {
+	cout << "FLEX integer" << endl;
+	return TOKEN_INT;
+}
+
+"real" {
+	cout << "FLEX real" << endl;
+	return TOKEN_REAL;
+}
+
 "end" {
 	cout << "FLEX end" << endl;
 	return TOKEN_END;	
@@ -39,6 +54,7 @@ identifier			[a-zA-Z]([[:alnum:]])*
 {identifier} {
 	cout<<"FLEX identifier "<<yytext<<endl;
 	yylval=table.putIdentifier(yytext);
+	cout<<"YYVAL identifier "<<yylval<<endl;
 	return TOKEN_ID;
 }
 

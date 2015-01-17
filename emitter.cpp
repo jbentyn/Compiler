@@ -17,9 +17,14 @@ emitter::~emitter() {
 }
 
  void emitter::putProgram(string programName ){
-     this->output<<";Program: "<<programName<<endl;
+     output<<";Program: "<<programName<<endl;
+     output<<"start:"<<endl;
  }
  
+ void emitter::putEnd(){
+     output<<"\t exit"<<endl;
+ }
+  
  void emitter::flush(const char* fileName) {
     ofstream outputStream;
     outputStream.open(fileName, fstream::out);

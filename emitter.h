@@ -19,6 +19,7 @@ public:
     emitter(const emitter& orig);
     
     void putProgram(string programName);
+    void putEnd();
     void flush(const char* fileName) ;
     virtual ~emitter();
 private:

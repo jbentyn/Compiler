@@ -1,1 +1,3 @@
-;Program: 
+;Program: test1
+start:
+	 exit
