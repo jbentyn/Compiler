@@ -1,10 +1,10 @@
 program test1(input,output);
-var i:integer;
+var i,n:integer;
 var r,p:real;
 begin
-    i:=1;
-    write(i);
-    r:=-1.23;
-    p:=r;
-    write(r,p);
+      
+    n:=-1;
+    write(n);
+    i:=(1*(2+3*4)+5);
+	write(i);
 end.

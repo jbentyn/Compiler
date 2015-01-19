@@ -10,6 +10,11 @@
 
 
 
+
+static int INT_SIZE=4;
+static int REAL_SIZE=8;
+
+static const char * SymbolTypeStrings[] = { "NONE", "PROGRAM_ID","INT","REAL","NUM_INT","NUM_REAL" };
 enum SymbolType{
     ST_NONE,
     ST_PROGAM_IDENTIFIER,
@@ -18,10 +23,16 @@ enum SymbolType{
     ST_NUM_INT,
     ST_NUM_REAL
 };
-static const char * SymbolTypeStrings[] = { "NONE", "PROGRAM_ID","INT","REAL","NUM_INT","NUM_REAL" };
 
-static int INT_SIZE=4;
-static int REAL_SIZE=8;
+static const char * OperatorTypeStrings[] = { "ADD", "SUB","MUL","DIV" };
+enum OpertatorType{
+    OP_ADD,
+    OP_SUB,
+    OP_MUL,
+    OP_DIV,
+};
+
+
 
 #endif	/* ENUMS_H */
 

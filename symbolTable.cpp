@@ -10,6 +10,7 @@
 
 symbolTable::symbolTable() {
     this->nextFreeAdress = 0;
+    this->nextTempNumber = 0;
 }
 
 int symbolTable::putIdentifier(string name) {
@@ -46,7 +47,17 @@ int symbolTable::putNumber(string lexem,SymbolType type){
     s.lexem=lexem;
     s.type=type;
     table.push_back(s);
-    s.print();
+    return table.size()-1;
+}
+
+int symbolTable::putTemp(SymbolType type){
+    symbol s;
+    stringstream ss;
+    ss << nextTempNumber++;
+    s.lexem="$t"+ss.str();
+    s.type=type;
+    table.push_back(s);
+    assignVar(table.size()-1,type);
     return table.size()-1;
 }
 

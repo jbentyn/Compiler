@@ -54,6 +54,10 @@
 
 //OPERATORS
 %token TOKEN_OP_ASSIGN
+%token TOKEN_OP_ADD
+%token TOKEN_OP_SUB
+%token TOKEN_OP_MUL
+%token TOKEN_OP_DIV
 
 %token TOKEN_ID
 
@@ -127,11 +131,55 @@ var_type :
 ;
 
 //---------- Instructions ----------------
-expr :
+expr: 
+	expr TOKEN_OP_ADD expr_mul{
+		$$=emit.putBinaryOperator($1,$3,OP_ADD);
+	}
+	|
+	expr TOKEN_OP_SUB expr_mul{
+		$$=emit.putBinaryOperator($1,$3,OP_SUB);
+	}
+	|
+	expr_mul{
+		$$=$1;
+	}
+;
+
+expr_mul: 
+	expr_mul TOKEN_OP_MUL parenthesis{
+		$$=emit.putBinaryOperator($1,$3,OP_MUL);
+	}
+	|
+	expr_mul TOKEN_OP_DIV parenthesis{
+	$$=emit.putBinaryOperator($1,$3,OP_DIV);
+	}
+	| TOKEN_OP_SUB parenthesis{
+		int temp = table.putTemp(ST_VAR_INT);
+		cout<<"temp"<<temp<<endl;
+		table.getSymbol(temp).lexem="0";
+		$$=emit.putBinaryOperator(temp,$2,OP_SUB);
+	}
+	|
+	parenthesis{
+	$$=$1;	
+	}
+;
+
+parenthesis:
+	'(' expr ')' {
+		$$=$2;
+	}
+	|
+	number{
+		$$=$1;
+	}
+;
+
+number :
 	TOKEN_ID|
 	TOKEN_NUM_INT|
 	TOKEN_NUM_REAL{
-		cout << "BISON FOUND EXPRESSION" << endl;
+		cout << "BISON FOUND NUMBER" << endl;
 		$$=$1;
 	}	
 ;

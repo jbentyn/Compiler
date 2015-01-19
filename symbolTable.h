@@ -11,6 +11,7 @@
 #include <vector>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 
 #include "enums.h"
 #include "symbol.h"
@@ -30,7 +31,7 @@ public:
     int putIdentifier(string name);
     void assignVar(int index, SymbolType type);
     int putNumber(string lexem,SymbolType type); 
-    
+    int putTemp(SymbolType type);
     
     
     symbol& getSymbol(int index);
@@ -41,6 +42,8 @@ private:
 
     vector<symbol> table;
     int nextFreeAdress;
+    int nextTempNumber;
+    
 };
 
 #endif	/* SYMBOLTABLE_H */

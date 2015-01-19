@@ -55,7 +55,11 @@ extern int yydebug;
     TOKEN_NUM_INT = 265,
     TOKEN_NUM_REAL = 266,
     TOKEN_OP_ASSIGN = 267,
-    TOKEN_ID = 268
+    TOKEN_OP_ADD = 268,
+    TOKEN_OP_SUB = 269,
+    TOKEN_OP_MUL = 270,
+    TOKEN_OP_DIV = 271,
+    TOKEN_ID = 272
   };
 #endif
 

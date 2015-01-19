@@ -10,14 +10,12 @@
 	extern symbolTable table;
 %}
 
-
-
 identifier			[a-zA-Z]([[:alnum:]])*
 real_number			{int_number}\.[0-9]+
-int_number			-?[0-9]+
-
+int_number			[0-9]+
 
 op_assign			":="
+
 
 %%
 [[:blank:]\r] {/* SKIP */}
@@ -65,6 +63,22 @@ op_assign			":="
 {op_assign} {
 	cout << "FLEX operator assign" << endl;
 	return TOKEN_OP_ASSIGN;	
+}
+
+"+" {
+	return TOKEN_OP_ADD;	
+}
+
+"-" {
+	return TOKEN_OP_SUB;	
+}
+
+"*" {
+	return TOKEN_OP_MUL;	
+}
+
+"/" {
+	return TOKEN_OP_DIV;	
 }
 
 {identifier} {

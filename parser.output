@@ -21,30 +21,42 @@ Gramatyka
    10 var_type: TOKEN_INT
    11         | TOKEN_REAL
 
-   12 expr: TOKEN_ID
-   13     | TOKEN_NUM_INT
-   14     | TOKEN_NUM_REAL
+   12 expr: expr TOKEN_OP_ADD expr_mul
+   13     | expr TOKEN_OP_SUB expr_mul
+   14     | expr_mul
 
-   15 instructions: instructions TOKEN_ID TOKEN_OP_ASSIGN expr ';'
-   16             | instructions procedure ';'
-   17             | %empty
+   15 expr_mul: expr_mul TOKEN_OP_MUL parenthesis
+   16         | expr_mul TOKEN_OP_DIV parenthesis
+   17         | TOKEN_OP_SUB parenthesis
+   18         | parenthesis
 
-   18 procedure: TOKEN_WRITE '(' arguments ')'
+   19 parenthesis: '(' expr ')'
+   20            | number
 
-   19 arguments: arguments ',' expr
-   20          | expr
-   21          | %empty
+   21 number: TOKEN_ID
+   22       | TOKEN_NUM_INT
+   23       | TOKEN_NUM_REAL
+
+   24 instructions: instructions TOKEN_ID TOKEN_OP_ASSIGN expr ';'
+   25             | instructions procedure ';'
+   26             | %empty
+
+   27 procedure: TOKEN_WRITE '(' arguments ')'
+
+   28 arguments: arguments ',' expr
+   29          | expr
+   30          | %empty
 
 
 Symbole terminalne i reguły, w których występują
 
 $end (0) 0
-'(' (40) 1 18
-')' (41) 1 18
-',' (44) 1 9 19
+'(' (40) 1 19 27
+')' (41) 1 19 27
+',' (44) 1 9 28
 '.' (46) 3
 ':' (58) 6
-';' (59) 1 6 15 16
+';' (59) 1 6 24 25
 error (256)
 TOKEN_PROGRAM (258) 1
 TOKEN_BEGIN (259) 4
@@ -52,41 +64,51 @@ TOKEN_END (260) 5
 TOKEN_VAR (261) 6
 TOKEN_INT (262) 10
 TOKEN_REAL (263) 11
-TOKEN_WRITE (264) 18
-TOKEN_NUM_INT (265) 13
-TOKEN_NUM_REAL (266) 14
-TOKEN_OP_ASSIGN (267) 15
-TOKEN_ID (268) 1 2 8 9 12 15
+TOKEN_WRITE (264) 27
+TOKEN_NUM_INT (265) 22
+TOKEN_NUM_REAL (266) 23
+TOKEN_OP_ASSIGN (267) 24
+TOKEN_OP_ADD (268) 12
+TOKEN_OP_SUB (269) 13 17
+TOKEN_OP_MUL (270) 15
+TOKEN_OP_DIV (271) 16
+TOKEN_ID (272) 1 2 8 9 21 24
 
 
 Symbole nieterminalne i reguły, w których występują
 
-$accept (20)
+$accept (24)
     po lewej: 0
-program (21)
+program (25)
     po lewej: 1, po prawej: 0
-program_identifier (22)
+program_identifier (26)
     po lewej: 2, po prawej: 1
-main_instruction_block (23)
+main_instruction_block (27)
     po lewej: 3, po prawej: 1
-main_begin (24)
+main_begin (28)
     po lewej: 4, po prawej: 3
-main_end (25)
+main_end (29)
     po lewej: 5, po prawej: 3
-var_declarations (26)
+var_declarations (30)
     po lewej: 6 7, po prawej: 1 6
-var_list (27)
+var_list (31)
     po lewej: 8 9, po prawej: 6 9
-var_type (28)
+var_type (32)
     po lewej: 10 11, po prawej: 6
-expr (29)
-    po lewej: 12 13 14, po prawej: 15 19 20
-instructions (30)
-    po lewej: 15 16 17, po prawej: 3 15 16
-procedure (31)
-    po lewej: 18, po prawej: 16
-arguments (32)
-    po lewej: 19 20 21, po prawej: 18 19
+expr (33)
+    po lewej: 12 13 14, po prawej: 12 13 19 24 28 29
+expr_mul (34)
+    po lewej: 15 16 17 18, po prawej: 12 13 14 15 16
+parenthesis (35)
+    po lewej: 19 20, po prawej: 15 16 17 18
+number (36)
+    po lewej: 21 22 23, po prawej: 20
+instructions (37)
+    po lewej: 24 25 26, po prawej: 3 24 25
+procedure (38)
+    po lewej: 27, po prawej: 25
+arguments (39)
+    po lewej: 28 29 30, po prawej: 27 28
 
 
 Stan 0
@@ -218,7 +240,7 @@ Stan 16
 
     3 main_instruction_block: main_begin . instructions main_end '.'
 
-    $domyślnie  redukcja przy użyciu reguły 17 (instructions)
+    $domyślnie  redukcja przy użyciu reguły 26 (instructions)
 
     instructions  przejście do stanu 19
 
@@ -242,8 +264,8 @@ Stan 18
 Stan 19
 
     3 main_instruction_block: main_begin instructions . main_end '.'
-   15 instructions: instructions . TOKEN_ID TOKEN_OP_ASSIGN expr ';'
-   16             | instructions . procedure ';'
+   24 instructions: instructions . TOKEN_ID TOKEN_OP_ASSIGN expr ';'
+   25             | instructions . procedure ';'
 
     TOKEN_END    przesunięcie, i przejście do stanu 22
     TOKEN_WRITE  przesunięcie, i przejście do stanu 23
@@ -279,14 +301,14 @@ Stan 22
 
 Stan 23
 
-   18 procedure: TOKEN_WRITE . '(' arguments ')'
+   27 procedure: TOKEN_WRITE . '(' arguments ')'
 
     '('  przesunięcie, i przejście do stanu 31
 
 
 Stan 24
 
-   15 instructions: instructions TOKEN_ID . TOKEN_OP_ASSIGN expr ';'
+   24 instructions: instructions TOKEN_ID . TOKEN_OP_ASSIGN expr ';'
 
     TOKEN_OP_ASSIGN  przesunięcie, i przejście do stanu 32
 
@@ -300,7 +322,7 @@ Stan 25
 
 Stan 26
 
-   16 instructions: instructions procedure . ';'
+   25 instructions: instructions procedure . ';'
 
     ';'  przesunięcie, i przejście do stanu 34
 
@@ -335,27 +357,37 @@ Stan 30
 
 Stan 31
 
-   18 procedure: TOKEN_WRITE '(' . arguments ')'
+   27 procedure: TOKEN_WRITE '(' . arguments ')'
 
     TOKEN_NUM_INT   przesunięcie, i przejście do stanu 36
     TOKEN_NUM_REAL  przesunięcie, i przejście do stanu 37
-    TOKEN_ID        przesunięcie, i przejście do stanu 38
+    TOKEN_OP_SUB    przesunięcie, i przejście do stanu 38
+    TOKEN_ID        przesunięcie, i przejście do stanu 39
+    '('             przesunięcie, i przejście do stanu 40
 
-    $domyślnie  redukcja przy użyciu reguły 21 (arguments)
+    $domyślnie  redukcja przy użyciu reguły 30 (arguments)
 
-    expr       przejście do stanu 39
-    arguments  przejście do stanu 40
+    expr         przejście do stanu 41
+    expr_mul     przejście do stanu 42
+    parenthesis  przejście do stanu 43
+    number       przejście do stanu 44
+    arguments    przejście do stanu 45
 
 
 Stan 32
 
-   15 instructions: instructions TOKEN_ID TOKEN_OP_ASSIGN . expr ';'
+   24 instructions: instructions TOKEN_ID TOKEN_OP_ASSIGN . expr ';'
 
     TOKEN_NUM_INT   przesunięcie, i przejście do stanu 36
     TOKEN_NUM_REAL  przesunięcie, i przejście do stanu 37
-    TOKEN_ID        przesunięcie, i przejście do stanu 38
+    TOKEN_OP_SUB    przesunięcie, i przejście do stanu 38
+    TOKEN_ID        przesunięcie, i przejście do stanu 39
+    '('             przesunięcie, i przejście do stanu 40
 
-    expr  przejście do stanu 41
+    expr         przejście do stanu 46
+    expr_mul     przejście do stanu 42
+    parenthesis  przejście do stanu 43
+    number       przejście do stanu 44
 
 
 Stan 33
@@ -367,9 +399,9 @@ Stan 33
 
 Stan 34
 
-   16 instructions: instructions procedure ';' .
+   25 instructions: instructions procedure ';' .
 
-    $domyślnie  redukcja przy użyciu reguły 16 (instructions)
+    $domyślnie  redukcja przy użyciu reguły 25 (instructions)
 
 
 Stan 35
@@ -381,75 +413,268 @@ Stan 35
 
 Stan 36
 
-   13 expr: TOKEN_NUM_INT .
+   22 number: TOKEN_NUM_INT .
 
-    $domyślnie  redukcja przy użyciu reguły 13 (expr)
+    $domyślnie  redukcja przy użyciu reguły 22 (number)
 
 
 Stan 37
 
-   14 expr: TOKEN_NUM_REAL .
+   23 number: TOKEN_NUM_REAL .
 
-    $domyślnie  redukcja przy użyciu reguły 14 (expr)
+    $domyślnie  redukcja przy użyciu reguły 23 (number)
 
 
 Stan 38
 
-   12 expr: TOKEN_ID .
+   17 expr_mul: TOKEN_OP_SUB . parenthesis
 
-    $domyślnie  redukcja przy użyciu reguły 12 (expr)
+    TOKEN_NUM_INT   przesunięcie, i przejście do stanu 36
+    TOKEN_NUM_REAL  przesunięcie, i przejście do stanu 37
+    TOKEN_ID        przesunięcie, i przejście do stanu 39
+    '('             przesunięcie, i przejście do stanu 40
+
+    parenthesis  przejście do stanu 47
+    number       przejście do stanu 44
 
 
 Stan 39
 
-   20 arguments: expr .
+   21 number: TOKEN_ID .
 
-    $domyślnie  redukcja przy użyciu reguły 20 (arguments)
+    $domyślnie  redukcja przy użyciu reguły 21 (number)
 
 
 Stan 40
 
-   18 procedure: TOKEN_WRITE '(' arguments . ')'
-   19 arguments: arguments . ',' expr
+   19 parenthesis: '(' . expr ')'
 
-    ','  przesunięcie, i przejście do stanu 42
-    ')'  przesunięcie, i przejście do stanu 43
+    TOKEN_NUM_INT   przesunięcie, i przejście do stanu 36
+    TOKEN_NUM_REAL  przesunięcie, i przejście do stanu 37
+    TOKEN_OP_SUB    przesunięcie, i przejście do stanu 38
+    TOKEN_ID        przesunięcie, i przejście do stanu 39
+    '('             przesunięcie, i przejście do stanu 40
+
+    expr         przejście do stanu 48
+    expr_mul     przejście do stanu 42
+    parenthesis  przejście do stanu 43
+    number       przejście do stanu 44
 
 
 Stan 41
 
-   15 instructions: instructions TOKEN_ID TOKEN_OP_ASSIGN expr . ';'
+   12 expr: expr . TOKEN_OP_ADD expr_mul
+   13     | expr . TOKEN_OP_SUB expr_mul
+   29 arguments: expr .
 
-    ';'  przesunięcie, i przejście do stanu 44
+    TOKEN_OP_ADD  przesunięcie, i przejście do stanu 49
+    TOKEN_OP_SUB  przesunięcie, i przejście do stanu 50
+
+    $domyślnie  redukcja przy użyciu reguły 29 (arguments)
 
 
 Stan 42
 
-   19 arguments: arguments ',' . expr
+   14 expr: expr_mul .
+   15 expr_mul: expr_mul . TOKEN_OP_MUL parenthesis
+   16         | expr_mul . TOKEN_OP_DIV parenthesis
 
-    TOKEN_NUM_INT   przesunięcie, i przejście do stanu 36
-    TOKEN_NUM_REAL  przesunięcie, i przejście do stanu 37
-    TOKEN_ID        przesunięcie, i przejście do stanu 38
+    TOKEN_OP_MUL  przesunięcie, i przejście do stanu 51
+    TOKEN_OP_DIV  przesunięcie, i przejście do stanu 52
 
-    expr  przejście do stanu 45
+    $domyślnie  redukcja przy użyciu reguły 14 (expr)
 
 
 Stan 43
 
-   18 procedure: TOKEN_WRITE '(' arguments ')' .
+   18 expr_mul: parenthesis .
 
-    $domyślnie  redukcja przy użyciu reguły 18 (procedure)
+    $domyślnie  redukcja przy użyciu reguły 18 (expr_mul)
 
 
 Stan 44
 
-   15 instructions: instructions TOKEN_ID TOKEN_OP_ASSIGN expr ';' .
+   20 parenthesis: number .
 
-    $domyślnie  redukcja przy użyciu reguły 15 (instructions)
+    $domyślnie  redukcja przy użyciu reguły 20 (parenthesis)
 
 
 Stan 45
 
-   19 arguments: arguments ',' expr .
+   27 procedure: TOKEN_WRITE '(' arguments . ')'
+   28 arguments: arguments . ',' expr
 
-    $domyślnie  redukcja przy użyciu reguły 19 (arguments)
+    ','  przesunięcie, i przejście do stanu 53
+    ')'  przesunięcie, i przejście do stanu 54
+
+
+Stan 46
+
+   12 expr: expr . TOKEN_OP_ADD expr_mul
+   13     | expr . TOKEN_OP_SUB expr_mul
+   24 instructions: instructions TOKEN_ID TOKEN_OP_ASSIGN expr . ';'
+
+    TOKEN_OP_ADD  przesunięcie, i przejście do stanu 49
+    TOKEN_OP_SUB  przesunięcie, i przejście do stanu 50
+    ';'           przesunięcie, i przejście do stanu 55
+
+
+Stan 47
+
+   17 expr_mul: TOKEN_OP_SUB parenthesis .
+
+    $domyślnie  redukcja przy użyciu reguły 17 (expr_mul)
+
+
+Stan 48
+
+   12 expr: expr . TOKEN_OP_ADD expr_mul
+   13     | expr . TOKEN_OP_SUB expr_mul
+   19 parenthesis: '(' expr . ')'
+
+    TOKEN_OP_ADD  przesunięcie, i przejście do stanu 49
+    TOKEN_OP_SUB  przesunięcie, i przejście do stanu 50
+    ')'           przesunięcie, i przejście do stanu 56
+
+
+Stan 49
+
+   12 expr: expr TOKEN_OP_ADD . expr_mul
+
+    TOKEN_NUM_INT   przesunięcie, i przejście do stanu 36
+    TOKEN_NUM_REAL  przesunięcie, i przejście do stanu 37
+    TOKEN_OP_SUB    przesunięcie, i przejście do stanu 38
+    TOKEN_ID        przesunięcie, i przejście do stanu 39
+    '('             przesunięcie, i przejście do stanu 40
+
+    expr_mul     przejście do stanu 57
+    parenthesis  przejście do stanu 43
+    number       przejście do stanu 44
+
+
+Stan 50
+
+   13 expr: expr TOKEN_OP_SUB . expr_mul
+
+    TOKEN_NUM_INT   przesunięcie, i przejście do stanu 36
+    TOKEN_NUM_REAL  przesunięcie, i przejście do stanu 37
+    TOKEN_OP_SUB    przesunięcie, i przejście do stanu 38
+    TOKEN_ID        przesunięcie, i przejście do stanu 39
+    '('             przesunięcie, i przejście do stanu 40
+
+    expr_mul     przejście do stanu 58
+    parenthesis  przejście do stanu 43
+    number       przejście do stanu 44
+
+
+Stan 51
+
+   15 expr_mul: expr_mul TOKEN_OP_MUL . parenthesis
+
+    TOKEN_NUM_INT   przesunięcie, i przejście do stanu 36
+    TOKEN_NUM_REAL  przesunięcie, i przejście do stanu 37
+    TOKEN_ID        przesunięcie, i przejście do stanu 39
+    '('             przesunięcie, i przejście do stanu 40
+
+    parenthesis  przejście do stanu 59
+    number       przejście do stanu 44
+
+
+Stan 52
+
+   16 expr_mul: expr_mul TOKEN_OP_DIV . parenthesis
+
+    TOKEN_NUM_INT   przesunięcie, i przejście do stanu 36
+    TOKEN_NUM_REAL  przesunięcie, i przejście do stanu 37
+    TOKEN_ID        przesunięcie, i przejście do stanu 39
+    '('             przesunięcie, i przejście do stanu 40
+
+    parenthesis  przejście do stanu 60
+    number       przejście do stanu 44
+
+
+Stan 53
+
+   28 arguments: arguments ',' . expr
+
+    TOKEN_NUM_INT   przesunięcie, i przejście do stanu 36
+    TOKEN_NUM_REAL  przesunięcie, i przejście do stanu 37
+    TOKEN_OP_SUB    przesunięcie, i przejście do stanu 38
+    TOKEN_ID        przesunięcie, i przejście do stanu 39
+    '('             przesunięcie, i przejście do stanu 40
+
+    expr         przejście do stanu 61
+    expr_mul     przejście do stanu 42
+    parenthesis  przejście do stanu 43
+    number       przejście do stanu 44
+
+
+Stan 54
+
+   27 procedure: TOKEN_WRITE '(' arguments ')' .
+
+    $domyślnie  redukcja przy użyciu reguły 27 (procedure)
+
+
+Stan 55
+
+   24 instructions: instructions TOKEN_ID TOKEN_OP_ASSIGN expr ';' .
+
+    $domyślnie  redukcja przy użyciu reguły 24 (instructions)
+
+
+Stan 56
+
+   19 parenthesis: '(' expr ')' .
+
+    $domyślnie  redukcja przy użyciu reguły 19 (parenthesis)
+
+
+Stan 57
+
+   12 expr: expr TOKEN_OP_ADD expr_mul .
+   15 expr_mul: expr_mul . TOKEN_OP_MUL parenthesis
+   16         | expr_mul . TOKEN_OP_DIV parenthesis
+
+    TOKEN_OP_MUL  przesunięcie, i przejście do stanu 51
+    TOKEN_OP_DIV  przesunięcie, i przejście do stanu 52
+
+    $domyślnie  redukcja przy użyciu reguły 12 (expr)
+
+
+Stan 58
+
+   13 expr: expr TOKEN_OP_SUB expr_mul .
+   15 expr_mul: expr_mul . TOKEN_OP_MUL parenthesis
+   16         | expr_mul . TOKEN_OP_DIV parenthesis
+
+    TOKEN_OP_MUL  przesunięcie, i przejście do stanu 51
+    TOKEN_OP_DIV  przesunięcie, i przejście do stanu 52
+
+    $domyślnie  redukcja przy użyciu reguły 13 (expr)
+
+
+Stan 59
+
+   15 expr_mul: expr_mul TOKEN_OP_MUL parenthesis .
+
+    $domyślnie  redukcja przy użyciu reguły 15 (expr_mul)
+
+
+Stan 60
+
+   16 expr_mul: expr_mul TOKEN_OP_DIV parenthesis .
+
+    $domyślnie  redukcja przy użyciu reguły 16 (expr_mul)
+
+
+Stan 61
+
+   12 expr: expr . TOKEN_OP_ADD expr_mul
+   13     | expr . TOKEN_OP_SUB expr_mul
+   28 arguments: arguments ',' expr .
+
+    TOKEN_OP_ADD  przesunięcie, i przejście do stanu 49
+    TOKEN_OP_SUB  przesunięcie, i przejście do stanu 50
+
+    $domyślnie  redukcja przy użyciu reguły 28 (arguments)
